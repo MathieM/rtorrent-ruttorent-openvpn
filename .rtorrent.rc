@@ -1,0 +1,86 @@
+# This is an example resource file for rTorrent. Copy to
+# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
+# uncomment the options you wish to enable.
+
+scgi_port=127.0.0.1:5000
+encoding_list = UTF-8
+
+# Logging
+log.open_file = "rtorrent.log", (cat,/home/rtorrent/rtorrent.log)
+log.add_output = "info", "rtorrent.log"
+log.add_output = "dht_info", "rtorrent.log"
+log.add_output = "tracker_info", "rtorrent.log"
+
+# Maximum and minimum number of peers to connect to per torrent.
+min_peers=4
+max_peers=500
+
+# Same as above but for seeding completed torrents (-1 = same as downloading)
+min_peers_seed = 1
+max_peers_seed = 500
+
+# Maximum number of simultanious uploads per torrent.
+max_uploads = 500
+
+# Global upload and download rate in KiB. "0" for unlimited.
+#download_rate = 0
+#upload_rate = 0
+
+#The encryption option enables or disables encryption. It is very important to enable this option, not only for yourself, but also for your peers in the torrent swarm. Some users need to obscure their bandwidth usage from their ISP. And it does not hurt to enable it even if you do not need the added security.
+#encryption = allow_incoming,try_outgoing,enable_retry
+#It is also possible to force all connections to use encryption. However, be aware that this stricter rule will reduce your client's availability:
+encryption = require,require_RC4,allow_incoming,try_outgoing
+
+# Default directory to save the downloaded torrents.
+directory = /home/rtorrent/downloads/incomplete
+
+# Default session directory. Make sure you don't run multiple instance
+# of rtorrent using the same session directory. Perhaps using a
+# relative path?
+session = /home/rtorrent/session
+
+#Schedules taken from http://web.archive.org/web/20140213003955/http://libtorrent.rakshasa.no/wiki/RTorrentCommonTasks#Movecompletedtorrentstodifferentdirectorydependingonwatchdirectory
+
+# Watch a directory for new torrents
+schedule = watch_directory_1,10,10,load_start=/home/rtorrent/watch/\*.torrent
+
+#Move completed torrents : when the torrent finishes, it executes "mv <base_path> /home/rtorrent/download/incomplete" and then sets the destination directory to "/home/rtorrent/download/complete". (0.8.4+)
+system.method.set_key = event.download.finished,move_complete,"execute=mv,-u,$d.get_base_path=,/home/rtorrent/download/incomplete;d.set_directory=/home/rtorrent/download/complete"
+
+# Stop torrents when disk space is low
+schedule = low_diskspace_1,5,60,close_low_diskspace=1024M
+
+# Stop torrents when reaching upload ratio in percent,
+# when also reaching total upload in bytes, or when
+# reaching final upload ratio in percent.
+# example: stop at ratio 2.0 with at least 200 MB uploaded, or else ratio 20.0
+#schedule = ratio,60,60,"stop_on_ratio=200,200M,2000"
+
+# Port range to use for listening.
+port_range = 49161-49161
+
+# Start opening ports at a random position within the port range.
+port_random = no
+
+# Check hash for finished torrents. Might be usefull until the bug is
+# fixed that causes lack of diskspace not to be properly reported.
+#check_hash = no
+
+# Set whetever the client should try to connect to UDP trackers.
+use_udp_trackers = yes
+
+# Enable DHT support for trackerless torrents or when all trackers are down.
+# May be set to "disable" (completely disable DHT), "off" (do not start DHT),
+# "auto" (start and stop DHT as needed), or "on" (start DHT immediately).
+# The default is "off". For DHT to work, a session directory must be defined.
+# 
+dht = off
+
+# UDP port to use for DHT. 
+# 
+# dht_port = 6881
+dht_port=49160
+
+# Enable peer exchange (for torrents not marked private)
+#
+peer_exchange = no
